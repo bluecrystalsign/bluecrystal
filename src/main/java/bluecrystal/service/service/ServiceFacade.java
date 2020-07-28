@@ -98,7 +98,7 @@ public class ServiceFacade {
 			byte[] hashSa = ccServ.hashSignedAttribSha256(origHash, signingTime, cert);
 
 			if (!verify.verify(NDX_SHA256, ccServ.calcSha256(hashSa), sign, cert)) {
-				// logger.error("Verificação retornou erro, lancando
+				// logger.error("VerificaÃ§Ã£o retornou erro, lancando
 				// InvalidSigntureException.");
 				throw new InvalidSigntureException();
 			} else {

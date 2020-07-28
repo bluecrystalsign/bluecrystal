@@ -178,7 +178,7 @@ public class CryptoServiceImpl implements CryptoService {
 		// Validate Certificate Status
 		boolean validateCertB = Boolean.parseBoolean(validateCert);
 		if (validateCertB) {
-			logger.debug("Certificado er· validado");
+			logger.debug("Certificado ser√° validado");
 
 			if (dtSign != null) {
 				operationStatus = certServ.isValid(dtSign, cert, verifyCRL);
@@ -188,7 +188,7 @@ public class CryptoServiceImpl implements CryptoService {
 			}
 		} else {
 			operationStatus = new OperationStatus(StatusConst.GOOD, new Date());
-			logger.warn("Certificado N√O ser· validado! Usar essa opÁ„o apenas em AMBIENTE DE TESTES. Altere no bluc.properties.");
+			logger.warn("Certificado N√ÉO ser√° validado! Usar essa op√ß√£o apenas em AMBIENTE DE TESTES. Altere no bluc.properties.");
 		}
 //			if (!(operationStatus.getStatus() == StatusConst.GOOD || 
 //				operationStatus.getStatus() == StatusConst.UNKNOWN)) {
@@ -222,7 +222,7 @@ public class CryptoServiceImpl implements CryptoService {
 					logger.error("Definido status da assinatura como StatusConst.INVALID_SIGN");
 					operationStatus.setStatus(StatusConst.INVALID_SIGN);
 				} else {
-					logger.debug("Assinatura È valida");
+					logger.debug("Assinatura √© valida");
 					
 				}
 			}

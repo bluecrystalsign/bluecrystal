@@ -145,7 +145,7 @@ public class CertificateService {
 
 	private static final String PJ_PF_ID = "2.16.76.1.3.4";
 	// PF 2.16.76.1.3.1 - Data Nascimento(8) , CPF(11), NIS (PIS, PASEP ou CI)
-	// (11), RG (15), orgão e UF (6).
+	// (11), RG (15), orgÃ£o e UF (6).
 
 	private static final String PF_PF_ID = "2.16.76.1.3.1";
 	private static final int BIRTH_DATE_INI = 0;
@@ -160,7 +160,7 @@ public class CertificateService {
 	private static final int RG_ORG_UF_LEN = RG_ORG_UF_INI + 6;
 	private static final int RG_UF_LEN = 2;
 
-	// PF 2.16.76.1.3.5 - Titulo de eleitor(12), Zona Eleitoral (3), Seção (4)
+	// PF 2.16.76.1.3.5 - Titulo de eleitor(12), Zona Eleitoral (3), SeÃ§Ã£o (4)
 	private static final int ELEITOR_INI = 0;
 	private static final int ELEITOR_LEN = 12;
 	private static final int ZONA_INI = ELEITOR_LEN;
@@ -172,9 +172,9 @@ public class CertificateService {
 	private static final int INSS_INI = 0;
 	private static final int INSS_LEN = 12;
 
-	// 2.16.76.1.4.2.1.1- = nas primeiras 07 (sete) posições os dígitos
-	// alfanuméricos do Número de Inscrição junto a Seccional, e nas 2 (duas)
-	// posições subseqüentes a sigla do Estado da Seccional.–
+	// 2.16.76.1.4.2.1.1- = nas primeiras 07 (sete) posiÃ§Ãµes os dÃ­gitos
+	// alfanumÃ©ricos do NÃºmero de InscriÃ§Ã£o junto a Seccional, e nas 2 (duas)
+	// posiÃ§Ãµes subseqÃ¼entes a sigla do Estado da Seccional.Â–
 	// private static final int OAB_REG_INI = 0;
 	// private static final int OAB_REG_LEN = 12;
 	// private static final int OAB_UF_INI = OAB_REG_LEN;
@@ -219,12 +219,12 @@ public class CertificateService {
 
 
 
-	// 5.2.3.1.1.2 Tamanho Mínimo de Chave
-	// O tamanho mínimo de chaves para criação de assinaturas segundo esta PA é
+	// 5.2.3.1.1.2 Tamanho MÃ­nimo de Chave
+	// O tamanho mÃ­nimo de chaves para criaÃ§Ã£o de assinaturas segundo esta PA Ã©
 	// de :
-	// a) para a versão 1.0: 1024 bits;
-	// b) para a versão 1.1: 1024 bits;
-	// b) para as versões 2.0 e 2.1: 2048 bits.
+	// a) para a versÃ£o 1.0: 1024 bits;
+	// b) para a versÃ£o 1.1: 1024 bits;
+	// b) para as versÃµes 2.0 e 2.1: 2048 bits.
 
 	public CertificateService() {
 		super();
@@ -900,29 +900,29 @@ public class CertificateService {
 
 	}
 
-	// 2.16.76.1.2.1.n Identificação de campos associados a Políticas de
+	// 2.16.76.1.2.1.n IdentificaÃ§Ã£o de campos associados a PolÃ­ticas de
 	// Certificados
 	// do tipo A1
-	// 2.16.76.1.2.2.n Identificação de campos associados a Políticas de
+	// 2.16.76.1.2.2.n IdentificaÃ§Ã£o de campos associados a PolÃ­ticas de
 	// Certificados c e r t i s i g n . c o m . b r
 	// do tipo A2
-	// 2.16.76.1.2.3.n Identificação de campos associados a Políticas de
+	// 2.16.76.1.2.3.n IdentificaÃ§Ã£o de campos associados a PolÃ­ticas de
 	// Certificados
 	// do tipo A3
-	// 2.16.76.1.2.4.n Identificação de campos associados a Políticas de
+	// 2.16.76.1.2.4.n IdentificaÃ§Ã£o de campos associados a PolÃ­ticas de
 	// Certificados
 	// do tipo A4
-	// 2.16.76.1.2.101.n Identificação de campos associados a Políticas de
+	// 2.16.76.1.2.101.n IdentificaÃ§Ã£o de campos associados a PolÃ­ticas de
 	// Certificados
 	// do tipo S1
-	// 2.16.76.1.2 2.16.76.1.2....102.n... Identificação de campos associados a
-	// Políticas de Certificados
+	// 2.16.76.1.2 2.16.76.1.2....102.n... IdentificaÃ§Ã£o de campos associados a
+	// PolÃ­ticas de Certificados
 	// do tipo 2
-	// 2.16.76.1.2 2.16.76.1.2....103.n... Identificação de campos associados a
-	// Políticas de Certificados
+	// 2.16.76.1.2 2.16.76.1.2....103.n... IdentificaÃ§Ã£o de campos associados a
+	// PolÃ­ticas de Certificados
 	// do tipo S3
-	// 2.16.76.1.2 2.16.76.1.2....104.n... Identificação de campos associados a
-	// Políticas de Certificados
+	// 2.16.76.1.2 2.16.76.1.2....104.n... IdentificaÃ§Ã£o de campos associados a
+	// PolÃ­ticas de Certificados
 	// do tipo S4
 	private static String getCertUsage(String pcOid) {
 		String ret = "";
