@@ -24,20 +24,20 @@ public class ExternalLoaderHttpTest {
 //	}
 	
 
-	@Test
-	public void testGetfromUrlNio() {
-		try {
-			
-			
-			HttpLoader httpLoader = PrefsFactory.getHttpLoader();
-			byte[] ret = httpLoader.get("https://p5.icpedu.rnp.br/crl");
-			System.out.println("resultado: "+ Base64.toBase64String(ret));
-			
-		} catch (Throwable e) {
-			fail(e.getLocalizedMessage());
-			e.printStackTrace();
-		}
-	}
+//	@Test
+//	public void testGetfromUrlNio() {
+//		try {
+//			
+//			
+//			HttpLoader httpLoader = PrefsFactory.getHttpLoader();
+//			byte[] ret = httpLoader.get("https://p5.icpedu.rnp.br/crl");
+//			System.out.println("resultado: "+ Base64.toBase64String(ret));
+//			
+//		} catch (Throwable e) {
+//			fail(e.getLocalizedMessage());
+//			e.printStackTrace();
+//		}
+//	}
 
 	@Test
 	public void testGetfromUrlNio2() {
