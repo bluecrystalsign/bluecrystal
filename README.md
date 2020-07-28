@@ -1,5 +1,7 @@
 # BlueCrystal
 
+![](https://github.com/bluecrystalsign/bluecrystal/workflows/Java%20CI/badge.svg)
+
 Biblioteca para o desenvolvimento de aplicações de assinatura digital.
 
 ## agora com suporte ao CAdES no padrão 2.3 da ICP-Brasil (DOC-ICP-15)
