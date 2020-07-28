@@ -73,7 +73,7 @@ public class SignVerifyService {
 		if (sig.length == expected.length) {
 			for (int i = 0; i < sig.length; i++) {
 				if (sig[i] != expected[i]) {
-					logger.error("Comprimento da assinatura é invalido.");
+					logger.error("Comprimento da assinatura Ã© invalido.");
 					return false;
 				}
 			}

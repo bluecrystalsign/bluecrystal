@@ -96,7 +96,7 @@ public class StatusValidatorImpl implements StatusValidator {
 			}
 		}
 
-		LOG.debug("Cert bom até .."+eeCertStatus.getGoodUntil());
+		LOG.debug("Cert bom atÃ© .."+eeCertStatus.getGoodUntil());
 		return eeCertStatus;
 	}
 

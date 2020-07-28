@@ -152,7 +152,7 @@ public class UtilsLocal {
 //			break;
 //
 //		default:
-//			throw new Exception("hash alg n„o identificado:" + hash);
+//			throw new Exception("hash alg n√£o identificado:" + hash);
 //
 //		}
 //		return ret;

@@ -65,7 +65,7 @@ public class CrlValidatorImpl implements CrlValidator {
 				}
 
 				if (lcr.getThisUpdate().before(date)) {
-					logger.debug("LCR È anterior a data da assinatura, n„o tenho como ter certeza do status: UNKOWN");
+					logger.debug("LCR √© anterior a data da assinatura, n√£o tenho como ter certeza do status: UNKOWN");
 
 					Date upd = lcr.getNextUpdate();
 					return new OperationStatus(StatusConst.UNKNOWN, upd);
