@@ -196,7 +196,7 @@ public class CryptoServiceImpl implements CryptoService {
 //			}
 			
 			// Go on with Validation,otherwise return error...
-			if (operationStatus.getStatus() == StatusConst.GOOD ){
+			if (operationStatus.getStatus() == StatusConst.GOOD || operationStatus.getStatus() == StatusConst.UNKNOWN){
 				int hashId = NDX_SHA1;
 				byte[] contentHash = null;
 				
