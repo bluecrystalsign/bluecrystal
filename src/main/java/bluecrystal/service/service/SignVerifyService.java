@@ -69,7 +69,13 @@ public class SignVerifyService {
         logger.debug("Sig:("+sig.length+")"+UtilsLocal.conv(sig));
         logger.debug("Exp:("+expected.length+")"+UtilsLocal.conv(expected));
 		
-		
+
+        System.out.println("Sig:("+sigBytes.length+")"+UtilsLocal.conv(sigBytes));
+        System.out.println("Has:("+contentHash.length+")"+UtilsLocal.conv(contentHash));
+        System.out.println("Sig:("+sig.length+")"+UtilsLocal.conv(sig));
+        System.out.println("Exp:("+expected.length+")"+UtilsLocal.conv(expected));
+
+        
 		if (sig.length == expected.length) {
 			for (int i = 0; i < sig.length; i++) {
 				if (sig[i] != expected[i]) {
