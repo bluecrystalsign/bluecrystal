@@ -150,7 +150,7 @@ public class CryptoServiceImpl implements CryptoService {
 	}
 
 	@Override
-	public int validateSignByContent(byte[] signCms, byte[] content,
+	public OperationStatus validateSignByContent(byte[] signCms, byte[] content,
 			Date dtSign, boolean verifyCRL) throws Exception {
 		byte[] origHash = null;
 		String hashIdStr = extractHashId(signCms);
@@ -162,7 +162,7 @@ public class CryptoServiceImpl implements CryptoService {
 		return validateSign(signCms, origHash, dtSign, verifyCRL);
 	}
 
-	public int validateSign(byte[] signCms, byte[] origHash, Date dtSign,
+	public OperationStatus validateSign(byte[] signCms, byte[] origHash, Date dtSign,
 			boolean verifyCRL) throws Exception {
 
 		boolean ret = true;
@@ -228,7 +228,7 @@ public class CryptoServiceImpl implements CryptoService {
 			}
 
 
-		return operationStatus.getStatus();
+		return operationStatus;
 	}
 
 

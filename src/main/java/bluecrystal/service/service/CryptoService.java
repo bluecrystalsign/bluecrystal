@@ -23,8 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Map;
 
+import bluecrystal.domain.OperationStatus;
 import bluecrystal.domain.SignCompare;
 import bluecrystal.domain.SignCompare2;
 import bluecrystal.domain.SignPolicyRef;
@@ -53,12 +53,12 @@ public interface CryptoService {
 	public SignPolicyRef extractVerifyRefence(byte[] policy) throws IOException, ParseException;
 	public boolean validateSignatureByPolicy(SignPolicyRef spr, SignCompare sc);
 	
-	public int  validateSign(byte[] sign, byte[] content,
+	public OperationStatus validateSign(byte[] sign, byte[] content,
 			Date dtSign, boolean verifyCRL) throws Exception;
 
 	SignCompare2 extractSignCompare2(byte[] sign) throws Exception;
 	
 	public boolean validateSignatureByPolicy(byte[] sign, byte[] ps) throws Exception;
 
-	int validateSignByContent(byte[] signCms, byte[] content, Date dtSign, boolean verifyCRL) throws Exception;
+	OperationStatus validateSignByContent(byte[] signCms, byte[] content, Date dtSign, boolean verifyCRL) throws Exception;
 }

@@ -18,5 +18,22 @@
 
 package bluecrystal.service.exception;
 
-public class UndefStateException extends Exception {
+import java.security.cert.X509Certificate;
+import java.util.Date;
+
+@SuppressWarnings("serial")
+public class NotBeforeException extends Exception {
+	private X509Certificate cert;
+
+	private Date dt;
+
+	public NotBeforeException(X509Certificate cert, Date dt) {
+		this.cert = cert;
+		this.dt = dt;
+	}
+
+	@Override
+	public String getMessage() {
+		return "Cerfiticado " + cert.getSubjectX500Principal().getName() + " não pode ser usado antes da data " + dt;
+	}
 }

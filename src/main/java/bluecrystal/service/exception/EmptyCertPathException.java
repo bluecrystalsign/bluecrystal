@@ -18,5 +18,10 @@
 
 package bluecrystal.service.exception;
 
-public class UndefStateException extends Exception {
+@SuppressWarnings("serial")
+public class EmptyCertPathException extends Exception {
+	@Override
+	public String getMessage() {
+		return "Caminho de certificação vazio";
+	}
 }

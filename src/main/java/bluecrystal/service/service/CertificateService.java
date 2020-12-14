@@ -64,6 +64,9 @@ import bluecrystal.domain.CertConstants;
 import bluecrystal.domain.CiKeyUsage;
 import bluecrystal.domain.OperationStatus;
 import bluecrystal.domain.StatusConst;
+import bluecrystal.service.exception.EmptyCertPathException;
+import bluecrystal.service.exception.NotAfterException;
+import bluecrystal.service.exception.NotBeforeException;
 import bluecrystal.service.exception.RevokedException;
 import bluecrystal.service.exception.UndefStateException;
 import bluecrystal.service.helper.UtilsLocal;
@@ -643,12 +646,12 @@ public class CertificateService {
 							this.getCrlDistributionPoints(cert));
 				}
 			} catch (Exception e) {
-				ret = new OperationStatus(StatusConst.UNTRUSTED, null);
+				ret = new OperationStatus(StatusConst.UNTRUSTED, null, e);
 			}
 
 		} else {
 			logger.error("** ERROR:certsOnPath == null " + new Date());
-			ret = new OperationStatus(StatusConst.UNTRUSTED, null);
+			ret = new OperationStatus(StatusConst.UNTRUSTED, null, new EmptyCertPathException());
 		}
 		logger.debug("Status retornado: "+ret);
 		return ret;
@@ -804,6 +807,17 @@ public class CertificateService {
 
 		PKIXParameters params = null;
 		params = createPKIXParms(trustAnchor, dtData);
+		
+		// Validate expirations dates to produce a more detailed error result
+		for (Certificate cert : certPath.getCertificates()) {
+			if (cert instanceof X509Certificate) {
+				X509Certificate x509 = (X509Certificate) cert;
+				if (dtData.before(x509.getNotBefore()))
+					throw new NotBeforeException(x509, dtData);
+				if (dtData.after(x509.getNotAfter()))
+					throw new NotAfterException(x509, dtData);
+			}
+		}
 
 		params.setRevocationEnabled(false);
 		if (certPathReview(certPath, params) == null) {

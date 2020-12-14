@@ -33,6 +33,7 @@ import org.bouncycastle.util.encoders.Base64;
 
 import bluecrystal.domain.AppSignedInfoEx;
 import bluecrystal.domain.NameValue;
+import bluecrystal.domain.OperationStatus;
 import bluecrystal.domain.SignCompare;
 import bluecrystal.domain.StatusConst;
 import bluecrystal.service.exception.InvalidSigntureException;
@@ -384,12 +385,12 @@ public class BlucApi {
 		setDetails(certificate, resp.getCertdetails());
 
 		if (politica == null) {
-			int signOk = getCcServ().validateSign(assinatura, sha1, dtAssinatura, verificarLCRs);
-			resp.setStatus(getMessageByStatus(signOk));
-			if (signOk != StatusConst.GOOD && signOk != StatusConst.UNKNOWN) {
-				resp.setError("Não foi possível validar a assinatura digital: " + getMessageByStatus(signOk));
+			OperationStatus signOk = getCcServ().validateSign(assinatura, sha1, dtAssinatura, verificarLCRs);
+			resp.setStatus(signOk.getMessageByStatus());
+			if (signOk.getStatus() != StatusConst.GOOD && signOk.getStatus() != StatusConst.UNKNOWN) {
+				resp.setError("Não foi possível validar a assinatura digital: " + signOk.getBestExplanation());
 			}
-			return signOk;
+			return signOk.getStatus();
 		} else {
 			int keyLength = 1024;
 
@@ -402,17 +403,17 @@ public class BlucApi {
 			else
 				origHash = sha256;
 
-			int signOk = getCcServ().validateSign(assinatura, origHash, dtAssinatura, verificarLCRs);
-			resp.setStatus(getMessageByStatus(signOk));
-			if (signOk != StatusConst.GOOD && signOk != StatusConst.UNKNOWN) {
-				resp.setError("Não foi possível validar a assinatura digital: " + getMessageByStatus(signOk));
-				return signOk;
+			OperationStatus signOk = getCcServ().validateSign(assinatura, origHash, dtAssinatura, verificarLCRs);
+			resp.setStatus(signOk.getMessageByStatus());
+			if (signOk.getStatus() != StatusConst.GOOD && signOk.getStatus() != StatusConst.UNKNOWN) {
+				resp.setError("Não foi possível validar a assinatura digital: " + signOk.getBestExplanation());
+				return signOk.getStatus();
 			}
 
 			boolean f = validateSignatureByPolicy(assinatura, null);
 			if (!f) {
 				resp.setError("Não foi possíel validar a assinatura com política");
-				return signOk;
+				return signOk.getStatus();
 			}
 			String policyName = recuperarNomePolitica(politica);
 			if (policyName != null) {
@@ -425,27 +426,6 @@ public class BlucApi {
 		}
 	}
 
-	private String getMessageByStatus(int i) {
-		Properties prop = getMessagens();
-
-		String msg = null;
-		if (prop != null)
-			msg = prop.getProperty("StatusConst." + i);
-		if (msg == null)
-			msg = "code " + i;
-		return msg;
-	}
-
-	private Properties getMessagens() {
-		Properties prop = new Properties();
-		try (InputStream in = getClass().getResourceAsStream("/bluc.messages.properties")) {
-			prop.load(in);
-			return prop;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
 	public byte[] attachContentsToPKCS7(byte[] content, byte[] detached, Date dtSign, boolean verifyCLR)
 			throws Exception {
 		String policy = obtemPolitica(detached);
@@ -454,9 +434,9 @@ public class BlucApi {
 		if (policy == null) {
 			byte[] contentSha1 = getCcServ().calcSha1(content);
 
-			int sts = getCcServ().validateSign(detached, contentSha1, dtSign, verifyCLR);
-			if (StatusConst.GOOD != sts && StatusConst.UNKNOWN != sts)
-				throw new Exception("invalid signature: " + getMessageByStatus(sts));
+			OperationStatus sts = getCcServ().validateSign(detached, contentSha1, dtSign, verifyCLR);
+			if (StatusConst.GOOD != sts.getStatus() && StatusConst.UNKNOWN != sts.getStatus())
+				throw new Exception("invalid signature: " + sts.getBestExplanation());
 
 			CMSSignedData s = new CMSSignedData(new CMSProcessableByteArray(content), detached);
 
@@ -535,9 +515,9 @@ public class BlucApi {
 			res = composeBodySha256(sign, cert, certList, origHash, signingTime, content.length);
 		}
 
-		int sts2 = StatusConst.INVALID_SIGN;
 		byte[] attached = null;
 		Exception savedException = null;
+		OperationStatus signOk = new OperationStatus(StatusConst.INVALID_SIGN, null);
 		for (int delta = 0; delta < 4; delta++) {
 			try {
 				Map<String, String> map = createBodyMap(res, content.length, delta);
@@ -549,7 +529,7 @@ public class BlucApi {
 				System.arraycopy(content, 0, attached, envelope_1.length, content.length);
 				System.arraycopy(envelope_2, 0, attached, envelope_1.length + content.length, envelope_2.length);
 
-				sts2 = getCcServ().validateSign(attached, origHash, dtSign, verifyCLR);
+				signOk = getCcServ().validateSign(attached, origHash, dtSign, verifyCLR);
 				savedException = null;
 				break;
 			} catch (Exception ioe) {
@@ -559,8 +539,8 @@ public class BlucApi {
 		}
 		if (savedException != null)
 			throw savedException;
-		if (StatusConst.GOOD != sts2 && StatusConst.UNKNOWN != sts2)
-			throw new Exception("invalid attached signature: " + getMessageByStatus(sts2));
+		if (StatusConst.GOOD != signOk.getStatus() && StatusConst.UNKNOWN != signOk.getStatus())
+			throw new Exception("invalid attached signature: " + signOk.getBestExplanation());
 		return attached;
 	}
 

@@ -157,7 +157,7 @@ public class ServiceFacade {
 			byte[] sign = Base64.decode(signCms);
 			byte[] origHash = Base64.decode(origHashb64);
 
-			int validateSign = ccServ.validateSign(sign, origHash, dtSign, verifyCRL);
+			int validateSign = ccServ.validateSign(sign, origHash, dtSign, verifyCRL).getStatus();
 			return validateSign;
 		} catch (Exception e) {
 //			logger.error("ERRO: ", e);

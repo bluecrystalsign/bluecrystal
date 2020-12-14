@@ -18,33 +18,78 @@
 
 package bluecrystal.domain;
 
+import java.io.InputStream;
 import java.util.Date;
+import java.util.Properties;
 
 public class OperationStatus {
-@Override
+	@Override
 	public String toString() {
-		return "CertStatus [status=" + status + ", goodUntil=" + goodUntil
-				+ "]";
+		return "CertStatus [status=" + status + ", goodUntil=" + goodUntil + "]";
 	}
-private int status;
-private Date goodUntil;
 
-public int getStatus() {
-	return status;
-}
-public void setStatus(int status) {
-	this.status = status;
-}
-public Date getGoodUntil() {
-	return goodUntil;
-}
-public void setGoodUntil(Date goodUntil) {
-	this.goodUntil = goodUntil;
-}
-public OperationStatus(int status, Date goodUntil) {
-	super();
-	this.status = status;
-	this.goodUntil = goodUntil;
-}
+	private int status;
+	private Date goodUntil;
+	private Exception exception;
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public Date getGoodUntil() {
+		return goodUntil;
+	}
+
+	public void setGoodUntil(Date goodUntil) {
+		this.goodUntil = goodUntil;
+	}
+
+	public OperationStatus(int status, Date goodUntil) {
+		super();
+		this.status = status;
+		this.goodUntil = goodUntil;
+	}
+
+	public OperationStatus(int status, Date goodUntil, Exception exception) {
+		super();
+		this.status = status;
+		this.goodUntil = goodUntil;
+		this.exception = exception;
+	}
+
+	public String getBestExplanation() {
+		if (this.exception != null)
+			return getMessageByStatus(getStatus()) + " - " + this.exception.getMessage();
+		return getMessageByStatus(getStatus());
+	}
+
+	public String getMessageByStatus() {
+		return getMessageByStatus(getStatus());
+	}
+
+	public String getMessageByStatus(int i) {
+		Properties prop = getMessagens();
+
+		String msg = null;
+		if (prop != null)
+			msg = prop.getProperty("StatusConst." + i);
+		if (msg == null)
+			msg = "code " + i;
+		return msg;
+	}
+
+	private Properties getMessagens() {
+		Properties prop = new Properties();
+		try (InputStream in = getClass().getResourceAsStream("/bluc.messages.properties")) {
+			prop.load(in);
+			return prop;
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 }
