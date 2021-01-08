@@ -37,6 +37,7 @@ import bluecrystal.domain.OperationStatus;
 import bluecrystal.domain.SignCompare;
 import bluecrystal.domain.StatusConst;
 import bluecrystal.service.exception.InvalidSigntureException;
+import bluecrystal.service.helper.UtilsLocal;
 import bluecrystal.service.service.ADRBService_23;
 import bluecrystal.service.service.CertificateService;
 import bluecrystal.service.service.CmsWithChainService;
@@ -249,6 +250,8 @@ public class BlucApi {
 		X509Certificate cert = loadCert(x509);
 
 		byte[] ret = getCcServ().composeBodySha256(sign, cert, origHash, signingTime);
+		
+		System.out.println(new String(Base64.encode(ret)));
 
 		byte[] hashSa = getCcServ().hashSignedAttribSha256(origHash, signingTime, cert);
 

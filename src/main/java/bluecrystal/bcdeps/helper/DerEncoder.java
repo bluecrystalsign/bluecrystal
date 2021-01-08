@@ -31,6 +31,7 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,6 +46,7 @@ import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1OutputStream;
@@ -54,9 +56,7 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
@@ -84,9 +84,12 @@ import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
+import org.bouncycastle.cms.CMSEnvelopedDataParser;
+import org.bouncycastle.cms.CMSSignedDataParser;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
+import org.bouncycastle.util.Store;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,12 +201,12 @@ public class DerEncoder {
 			X509Certificate certContent, byte[] content, String hashId,
 			int version) throws CertificateEncodingException, IOException {
 		final ASN1EncodableVector whole = new ASN1EncodableVector();
-		whole.add(new DERObjectIdentifier(CMS_SIGNED_ID));
+		whole.add(new ASN1ObjectIdentifier(CMS_SIGNED_ID));
 
 		final ASN1EncodableVector body = new ASN1EncodableVector();
 		// ----- versao -------
 		// final int version = 1;
-		body.add(new DERInteger(version));
+		body.add(new ASN1Integer(version));
 		buildDigestAlg(body, hashId);
 		// buildContentInfo(body, content);
 		buildCerts(body, certContent);
@@ -220,12 +223,12 @@ public class DerEncoder {
 			X509Certificate certContent, List<X509Certificate> chain,
 			int hashId, int version, int attachSize) throws Exception {
 		final ASN1EncodableVector whole = new ASN1EncodableVector(); // 0 SEQ
-		whole.add(new DERObjectIdentifier(CMS_SIGNED_ID)); // 1 SEQ
+		whole.add(new ASN1ObjectIdentifier(CMS_SIGNED_ID)); // 1 SEQ
 
 		final ASN1EncodableVector body = new ASN1EncodableVector();
 		// ----- versao -------
 		// final int version = 1;
-		body.add(new DERInteger(version)); // 3 INT
+		body.add(new ASN1Integer(version)); // 3 INT
 		buildDigestAlg(body, getHashAlg(hashId)); // 3 SET
 		buildContentInfo(body, attachSize); // 3 SEQ
 		buildCerts(body, chain); // 3 CS
@@ -251,12 +254,12 @@ public class DerEncoder {
 			boolean signingCertFallback, int attachSize) throws Exception {
 		// AppSignedInfoEx asiEx = listAsiEx.get(0);
 		final ASN1EncodableVector whole = new ASN1EncodableVector(); // 0 SEQ
-		whole.add(new DERObjectIdentifier(CMS_SIGNED_ID)); // 1 SEQ
+		whole.add(new ASN1ObjectIdentifier(CMS_SIGNED_ID)); // 1 SEQ
 
 		final ASN1EncodableVector body = new ASN1EncodableVector();
 		// ----- versao -------
 		// final int version = 1;
-		body.add(new DERInteger(version)); // 3 INT
+		body.add(new ASN1Integer(version)); // 3 INT
 
 		List<String> listHashId = createHashList(listAsiEx);
 		buildDigestAlg(body, listHashId); // 3 SET
@@ -330,7 +333,7 @@ public class DerEncoder {
 
 		final ASN1EncodableVector vec = new ASN1EncodableVector();
 		final ASN1EncodableVector signerinfoVector = new ASN1EncodableVector();
-		signerinfoVector.add(new DERInteger(SI_VERSION));
+		signerinfoVector.add(new ASN1Integer(SI_VERSION));
 
 		signerinfoVector.add(siAddCert(certContent));
 		signerinfoVector.add(siAddDigestAlgorithm(getHashAlg(hashId)));
@@ -358,7 +361,7 @@ public class DerEncoder {
 			String hashId = getHashAlg(next.getIdSha());
 			String hashSignId = getHashSignAlg(next.getIdSha());
 
-			signerinfoVector.add(new DERInteger(SI_VERSION));
+			signerinfoVector.add(new ASN1Integer(SI_VERSION));
 
 			signerinfoVector.add(siAddCert(next.getX509()));
 			signerinfoVector.add(siAddDigestAlgorithm(hashId));
@@ -395,7 +398,7 @@ public class DerEncoder {
 	//
 	// final ASN1EncodableVector vec = new ASN1EncodableVector();
 	// final ASN1EncodableVector signerinfoVector = new ASN1EncodableVector();
-	// signerinfoVector.add(new DERInteger(SI_VERSION));
+	// signerinfoVector.add(new ASN1Integer(SI_VERSION));
 	//
 	// signerinfoVector.add(siAddCert(certContent));
 	// signerinfoVector.add(siAddDigestAlgorithm(hashId));
@@ -511,9 +514,9 @@ public class DerEncoder {
 
 	private Attribute createContentType() {
 		// // final ASN1EncodableVector desSeq = new ASN1EncodableVector();
-		// // desSeq.add(new DERObjectIdentifier(ID_CONTENT_TYPE));
+		// // desSeq.add(new ASN1ObjectIdentifier(ID_CONTENT_TYPE));
 		final ASN1EncodableVector setEV = new ASN1EncodableVector();
-		setEV.add(new DERObjectIdentifier(ID_PKCS7_DATA));
+		setEV.add(new ASN1ObjectIdentifier(ID_PKCS7_DATA));
 
 		DERSet set = new DERSet(setEV);
 		// // desSeq.add(set);
@@ -548,7 +551,7 @@ public class DerEncoder {
 			String sigPolicyUri, String sigPolicyId) {
 
 		final ASN1EncodableVector desSeq12 = new ASN1EncodableVector();
-		desSeq12.add(new DERObjectIdentifier(polHashAlg));
+		desSeq12.add(new ASN1ObjectIdentifier(polHashAlg));
 		DERSequence seq12 = new DERSequence(desSeq12);
 
 		final ASN1EncodableVector desSeq1 = new ASN1EncodableVector();
@@ -561,7 +564,7 @@ public class DerEncoder {
 		// IGUALAR AO ITAU
 
 		final ASN1EncodableVector desSeq22 = new ASN1EncodableVector();
-		desSeq22.add(new DERObjectIdentifier(ID_SIG_POLICY_URI));
+		desSeq22.add(new ASN1ObjectIdentifier(ID_SIG_POLICY_URI));
 		desSeq22.add(new DERIA5String(sigPolicyUri));
 		DERSequence seq22 = new DERSequence(desSeq22);
 
@@ -572,7 +575,7 @@ public class DerEncoder {
 
 		final ASN1EncodableVector aevDSet1 = new ASN1EncodableVector();
 		final ASN1EncodableVector aevDSeq1 = new ASN1EncodableVector();
-		aevDSeq1.add(new DERObjectIdentifier(sigPolicyId));
+		aevDSeq1.add(new ASN1ObjectIdentifier(sigPolicyId));
 		aevDSeq1.add(seq1);
 
 		aevDSeq1.add(seq2);
@@ -633,7 +636,7 @@ public class DerEncoder {
 
 		// serialNumber CertificateSerialNumber
 		BigInteger serialNumber = certContent.getSerialNumber();
-		issuerSerialaev.add(new DERInteger(serialNumber));
+		issuerSerialaev.add(new ASN1Integer(serialNumber));
 
 		DERSequence issuerSerial = new DERSequence(issuerSerialaev);
 		// *** END ***
@@ -647,7 +650,7 @@ public class DerEncoder {
 		// hashAlgorithm AlgorithmIdentifier
 
 		if (!((signingCertFallback && hashId == NDX_SHA1) || (!signingCertFallback && hashId == NDX_SHA256))) {
-			DERObjectIdentifier hashAlgorithm = new DERObjectIdentifier(
+			ASN1ObjectIdentifier hashAlgorithm = new ASN1ObjectIdentifier(
 					getHashAlg(hashId));
 			essCertIDv2aev.add(hashAlgorithm);
 		}
@@ -687,7 +690,7 @@ public class DerEncoder {
 
 		final ASN1EncodableVector vec = new ASN1EncodableVector();
 		final ASN1EncodableVector signerinfoVector = new ASN1EncodableVector();
-		signerinfoVector.add(new DERInteger(SI_VERSION)); // 5 INT
+		signerinfoVector.add(new ASN1Integer(SI_VERSION)); // 5 INT
 
 		signerinfoVector.add(siAddCert(certContent));
 		signerinfoVector.add(siAddDigestAlgorithm(hashId));
@@ -738,7 +741,7 @@ public class DerEncoder {
 		// sha256WithRSAEncryption(1.2.840.113549.1.1.11).
 
 		ASN1EncodableVector digestEncVetor = new ASN1EncodableVector();
-		digestEncVetor.add(new DERObjectIdentifier(hashId));
+		digestEncVetor.add(new ASN1ObjectIdentifier(hashId));
 		// VER NOTA
 		// digestEncVetor.add(new DERNull());
 		return new DERSequence(digestEncVetor);
@@ -747,8 +750,8 @@ public class DerEncoder {
 	private DERSequence siAddDigestAlgorithm(String hashId) {
 		// Add the digestEncAlgorithm
 		ASN1EncodableVector digestVetor = new ASN1EncodableVector();
-		digestVetor.add(new DERObjectIdentifier(hashId)); // 6 OID
-		digestVetor.add(new DERNull()); // 6 NULL
+		digestVetor.add(new ASN1ObjectIdentifier(hashId)); // 6 OID
+		digestVetor.add(DERNull.INSTANCE); // 6 NULL
 		return new DERSequence(digestVetor); // 5 SEQ
 	}
 
@@ -757,7 +760,7 @@ public class DerEncoder {
 		ASN1EncodableVector certVetor = new ASN1EncodableVector();
 		certVetor.add(getEncodedIssuer(certContent.getTBSCertificate())); // 6
 																			// ISSUER
-		certVetor.add(new DERInteger(certContent.getSerialNumber())); // 6 INT -
+		certVetor.add(new ASN1Integer(certContent.getSerialNumber())); // 6 INT -
 																		// SERIAL
 		return (new DERSequence(certVetor)); // 5 SEQ
 
@@ -819,7 +822,7 @@ public class DerEncoder {
 
 		// ------ Content Info
 		ASN1EncodableVector contentInfoVector = new ASN1EncodableVector();
-		contentInfoVector.add(new DERObjectIdentifier(ID_PKCS7_DATA)); // 4 OID
+		contentInfoVector.add(new ASN1ObjectIdentifier(ID_PKCS7_DATA)); // 4 OID
 		if (size != DETACHED) {
 			byte[] content = new byte[size];
 			for (int i = 0; i < size; i++) {
@@ -839,8 +842,8 @@ public class DerEncoder {
 	private void buildDigestAlg(final ASN1EncodableVector body, String hashId) {
 		// ---------- algoritmos de digest
 		final ASN1EncodableVector algos = new ASN1EncodableVector();
-		algos.add(new DERObjectIdentifier(hashId)); // 4 OID
-		algos.add(new DERNull()); // 4 NULL
+		algos.add(new ASN1ObjectIdentifier(hashId)); // 4 OID
+		algos.add(DERNull.INSTANCE); // 4 NULL
 		final ASN1EncodableVector algoSet = new ASN1EncodableVector();
 		algoSet.add(new DERSequence(algos));
 		final DERSet digestAlgorithms = new DERSet(algoSet); // 2
@@ -853,8 +856,8 @@ public class DerEncoder {
 		// ---------- algoritmos de digest
 		final ASN1EncodableVector algos = new ASN1EncodableVector();
 		for (String next : listHashId) {
-			algos.add(new DERObjectIdentifier(next)); // 4 OID
-			algos.add(new DERNull()); // 4 NULL
+			algos.add(new ASN1ObjectIdentifier(next)); // 4 OID
+			algos.add(DERNull.INSTANCE); // 4 NULL
 		}
 
 		final ASN1EncodableVector algoSet = new ASN1EncodableVector();
@@ -1183,43 +1186,15 @@ public class DerEncoder {
 	
 	
 	public static List<byte[]> extractCertList(byte[] sign) throws Exception {
-		List<byte[]> ret = null;
-		ASN1InputStream is = new ASN1InputStream(new ByteArrayInputStream(sign));
-		ASN1Primitive topLevel = is.readObject();
-		LOG.trace("top level:"
-				+ topLevel.getClass().getName());
-
-		if (topLevel instanceof org.bouncycastle.asn1.DLSequence) {
-			DLSequence topLevelDLS = (DLSequence) topLevel;
-			if (topLevelDLS.size() == 2) {
-				ASN1Encodable level1 = topLevelDLS.getObjectAt(1);
-				LOG.trace("level1:"
-						+ level1.getClass().getName());
-				if (level1 instanceof org.bouncycastle.asn1.DERTaggedObject) {
-					DERTaggedObject level1TO = (DERTaggedObject) level1;
-					ASN1Primitive level2 = level1TO.getObject();
-					LOG.trace("level2:"
-							+ level2.getClass().getName());
-					if (level2 instanceof org.bouncycastle.asn1.DERSequence) {
-						DERSequence level2DS = (DERSequence) level2;
-						LOG.trace("level2 len:"
-								+ level2DS.size());
-						ret = extractCertArray(level2DS);
-					} else {
-						throw new Exception("DER enconding error");
-					}
-
-				} else {
-					throw new Exception("DER enconding error");
-				}
-			} else {
-				throw new Exception("DER enconding error");
-			}
-
-		} else {
-			throw new Exception("DER enconding error");
+		CMSSignedDataParser sp = new CMSSignedDataParser(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build(), new ByteArrayInputStream(sign));
+//		sp.getSignedContent().drain();
+		Store store = sp.getCertificates();
+		Collection<X509CertificateHolder> certs = store.getMatches(null);
+		
+		List<byte[]> ret = new ArrayList<>();
+		for (X509CertificateHolder cert : certs) {
+			ret.add(cert.getEncoded());
 		}
-
 		return ret;
 	}
 	
@@ -1926,7 +1901,7 @@ public class DerEncoder {
 			ASN1Encodable derObj3 = derSeq.getObjectAt(0);
 			DERTaggedObject derTO = (DERTaggedObject) derObj3;
 			int tag = derTO.getTagNo();
-			boolean empty = derTO.isEmpty();
+			// boolean empty = derTO.isEmpty();
 			ASN1Primitive derObj4 = derTO.getObject();
 			DEROctetString ocStr4 = (DEROctetString) derObj4;
 			ret = ocStr4.getOctets();
@@ -1984,7 +1959,7 @@ public class DerEncoder {
 	public static AlgorithmIdentifier createAlgorithm(int hashId)
 			throws Exception {
 		return new AlgorithmIdentifier(new ASN1ObjectIdentifier(
-				DerEncoder.getHashAlg(hashId)), new DERNull());
+				DerEncoder.getHashAlg(hashId)), DERNull.INSTANCE);
 	}
 
 	public static Map<String, String> getCertPolicies(byte[] certPols, int index)
@@ -2176,7 +2151,7 @@ public class DerEncoder {
 		
 		return ocspRequestGenerator.build();
 		
-//		Vector<DERObjectIdentifier> oids = new Vector<DERObjectIdentifier>();
+//		Vector<ASN1ObjectIdentifier> oids = new Vector<ASN1ObjectIdentifier>();
 //		Vector<X509Extension> values = new Vector<X509Extension>();
 //
 //		oids.add(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
@@ -2197,7 +2172,7 @@ public class DerEncoder {
 //		ocspRequestGenerator.addRequest(certId);
 //
 //		BigInteger nonce = BigInteger.valueOf(System.currentTimeMillis());
-//		Vector<DERObjectIdentifier> oids = new Vector<DERObjectIdentifier>();
+//		Vector<ASN1ObjectIdentifier> oids = new Vector<ASN1ObjectIdentifier>();
 //		Vector<X509Extension> values = new Vector<X509Extension>();
 //
 //		oids.add(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
@@ -2228,7 +2203,7 @@ public class DerEncoder {
 			ASN1Primitive aiaExt) {
 		AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(aiaExt);
 		AccessDescription[] accessDescriptions = aia.getAccessDescriptions();
-		DERObjectIdentifier OCSPOid = new DERObjectIdentifier(
+		ASN1ObjectIdentifier OCSPOid = new ASN1ObjectIdentifier(
 				"1.3.6.1.5.5.7.48.1"); //$NON-NLS-1$
 		for (AccessDescription accessDescription : accessDescriptions) {
 			GeneralName generalName = accessDescription.getAccessLocation();
