@@ -813,9 +813,9 @@ public class CertificateService {
 			if (cert instanceof X509Certificate) {
 				X509Certificate x509 = (X509Certificate) cert;
 				if (dtData.before(x509.getNotBefore()))
-					throw new NotBeforeException(x509, dtData);
+					throw new NotBeforeException(x509, x509.getNotBefore());
 				if (dtData.after(x509.getNotAfter()))
-					throw new NotAfterException(x509, dtData);
+					throw new NotAfterException(x509, x509.getNotAfter());
 			}
 		}
 
