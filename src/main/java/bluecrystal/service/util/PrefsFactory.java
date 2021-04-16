@@ -27,6 +27,10 @@ public class PrefsFactory {
 		return Messages.getString("FSRepoLoader.certFolder");
 	}
 
+	public static void setRepoLoader(RepoLoader loader) {
+		repoLoader = loader;
+	}
+	
 	public static RepoLoader getRepoLoader() {
 		if (repoLoader != null)
 			return repoLoader;
